@@ -32,7 +32,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Delivery Jar
+    - name: Delivery JAR
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -40,10 +40,10 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         source: "./build/libs/*.jar"
-        target: "~/service"
+        target: ${{ env.PROD_PROJECT_HOME }}/${{ env.PROD_SERVICE_NAME }}.jar
         strip_components: 1
 
-    - name: Deploy
+    - name: Delivery to deploy
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
