@@ -11,8 +11,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    env:
+      PROD_SERVICE_NAME: spring-test
+      PROD_PROJECT_HOME: ~/service/spring-test
+      EXECUTABLE_NAME: spring-test.jar
 
     steps:
     - uses: actions/checkout@v2
@@ -39,3 +42,28 @@ jobs:
         source: "./build/libs/*.jar"
         target: "~/service"
         strip_components: 1
+
+    - name: Deploy
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        source: ${{ env.PROD_SERVICE_NAME }}.*
+        target: ${{ env.PROD_PROJECT_HOME }}
+        strip_components: 1
+
+#    - name: run
+#      uses: appleboy/ssh-action@master
+#      with:
+#        host: ${{ secrets.HOST }}
+#        username: ${{ secrets.USERNAME }}
+#        password: ${{ secrets.PASSWORD }}
+#        port: ${{ secrets.PORT }}
+#        script: |
+#          sudo \[ -f /etc/init.d/${{ env.PROD_SERVICE_NAME }} \] || sudo ln -sf ${{ env.PROD_PROJECT_HOME }}/${{ env.EXECUTABLE_NAME }} /etc/init.d/${{ env.PROD_SERVICE_NAME }}
+#          sudo chown ec2-user:ec2-user ${{ env.PROD_PROJECT_HOME }}/${{ env.EXECUTABLE_NAME }}
+#          sudo cp ${{ env.PROD_SERVICE_NAME }}.service /lib/systemd/system/
+#          sudo cp ${{ env.PROD_SERVICE_NAME }}.conf ${{ env.PROD_PROJECT_HOME }}/${{ env.PROD_SERVICE_NAME }}.conf
+
